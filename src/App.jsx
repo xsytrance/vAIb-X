@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AtmosphereProvider, useAtmosphere } from './atmosphere/AtmosphereProvider'
-import { useAgent } from './agent/AgentProvider'
+import { AgentProvider, useAgent } from './agent/AgentProvider'
 import AtmosphereCanvas from './visual/AtmosphereCanvas'
 import Visualizer from './visual/Visualizer'
 import { startAudioAtmosphere, stopAudioAtmosphere, updateAudioAtmosphere } from './audio/AudioAtmosphere'
@@ -833,7 +833,9 @@ function getNodeName() {
 export default function App() {
   return (
     <AtmosphereProvider nodeOptions={{ name: getNodeName(), type: 'desktop' }}>
-      <AppContent />
+      <AgentProvider>
+        <AppContent />
+      </AgentProvider>
     </AtmosphereProvider>
   )
 }
