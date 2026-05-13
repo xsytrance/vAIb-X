@@ -4,10 +4,10 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host 0.0.0.0 --port 6667",
+    "dev": "vite --host 0.0.0.0 --port 5556",
     "build": "vite build",
-    "build:android": "VITE_API_BASE=${VITE_API_BASE:-http://localhost:6666} vite build && npx cap sync android",
-    "preview": "vite preview --host 0.0.0.0 --port 6667",
+    "build:android": "VITE_API_BASE=${VITE_API_BASE:-http://localhost:5555} vite build && npx cap sync android",
+    "preview": "vite preview --host 0.0.0.0 --port 5556",
     "api:library": "node server/api.mjs",
     "relay": "node server/relay.mjs",
     "android:sync": "npx cap sync android",
