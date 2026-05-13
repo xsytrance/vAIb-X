@@ -100,13 +100,11 @@ export function AgentProvider({ children }) {
   useEffect(() => {
     if (!discovery || discovery.source === 'waiting') {
       // Still waiting for first DISCOVERY_RESULT from relay
-      console.log('[TEMP][AgentProvider] Waiting for DISCOVERY_RESULT from relay...');
       return;
     }
 
     if (discovery.source === 'relay') {
       const conf = discovery.confidence || 'unknown';
-      console.log('[TEMP][AgentProvider] DISCOVERY_RESULT received — agents=' + discovery.agents.length + ', dominant=' + (discovery.dominant || 'none') + ', confidence=' + conf);
 
       const agents = discovery.agents || [];
 
@@ -145,7 +143,6 @@ export function AgentProvider({ children }) {
         source: 'relay',
       });
 
-      console.log('[TEMP][AgentProvider] Station composed — active=' + active.length + ', dormant=' + dormant.length + ', ghost=' + ghost.length + ', archival=' + archival.length + ', mood=' + stationMood + ', confidence=' + conf);
     }
   }, [discovery]);
 
@@ -206,7 +203,6 @@ export function AgentProvider({ children }) {
         };
 
     if (domAgent) {
-      console.log('[TEMP][AgentProvider] Signal controller configured from: ' + domAgent.name);
       const derived = deriveSignalFromAgent(domAgent);
       saito.taste = {
         energy: derived.energy,
@@ -216,7 +212,6 @@ export function AgentProvider({ children }) {
         pace: derived.pace,
       };
     } else {
-      console.log('[TEMP][AgentProvider] No dominant agent — generic controller, station quiet');
     }
 
     // Build rotation — generic procedural signals, no Saito branding
@@ -241,7 +236,6 @@ export function AgentProvider({ children }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (!station.source || station.source === 'waiting') {
-        console.log('[TEMP][AgentProvider] Discovery timeout — marking station quiet');
         setStation(prev => ({
           ...prev,
           source: 'quiet',

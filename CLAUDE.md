@@ -13,7 +13,7 @@ node server/api.mjs      # port 4014 — REST + agent discovery + music
 npm run dev              # port 4013 — Vite/React UI
 ```
 
-Both bind to `0.0.0.0` — accessible at `http://100.110.224.126:4013`.
+Both bind to `0.0.0.0` — accessible at `http://<your-host-ip>:4013`.
 
 Credentials in `.env` (gitignored). Do not commit it.
 

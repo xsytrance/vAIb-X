@@ -32,7 +32,7 @@ async function refreshDiscovery() {
     // Push to all connected clients
     const payload = JSON.stringify({ type: 'DISCOVERY_RESULT', ...lastDiscovery });
     const agentCount = lastDiscovery.agents?.length || 0;
-    console.log(`[TEMP][RELAY] DISCOVERY_RESULT pushing to ${clients.size} clients — ${agentCount} agents, dominant=${lastDiscovery.dominant || 'none'}, confidence=${lastDiscovery.confidence || 'unknown'}`);
+    // Discovery result broadcast to ${clients.size} clients
     for (const [id, socket] of clients) {
       if (socket.readyState === 1) {
         socket.send(payload);

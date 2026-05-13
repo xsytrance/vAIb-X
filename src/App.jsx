@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AtmosphereProvider, useAtmosphere } from './atmosphere/AtmosphereProvider'
-import { AgentProvider, useAgent } from './agent/AgentProvider'
-// NOTE: No Saito imports. All display is driven by backend discovery only.
+import { useAgent } from './agent/AgentProvider'
 import AtmosphereCanvas from './visual/AtmosphereCanvas'
 import Visualizer from './visual/Visualizer'
 import { startAudioAtmosphere, stopAudioAtmosphere, updateAudioAtmosphere } from './audio/AudioAtmosphere'
@@ -29,11 +28,13 @@ async function loadTracks() {
   const d = await r.json()
   return d.tracks || []
 }
-async function sendAction(action, payload = {}) {
+async function sendAction(action, payload = {}, agentId) {
+  const body = { action, payload }
+  if (agentId) body.agentId = agentId
   const r = await fetch(`${API}/action`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action, payload }),
+    body: JSON.stringify(body),
   })
   if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || 'Request failed')
   return r.json()
@@ -473,7 +474,7 @@ function MoreTab({ state, act, networkPanel }) {
 // ============================================================
 // Mini Player (docked above tab bar)
 // ============================================================
-function MiniPlayer({ tunedAgent, track, playing, progress, duration, onToggle, onNext, onSeek }) {
+function MiniPlayer({ tunedAgent, track, playing, progress, duration, onToggle, onNext, onSeek, onResonant, onStatic, onNudge }) {
   if (!tunedAgent) return null
   const pct = duration ? (progress / duration) * 100 : 0
 
@@ -491,6 +492,15 @@ function MiniPlayer({ tunedAgent, track, playing, progress, duration, onToggle, 
           <span className="miniPlayerTime">{formatDuration(progress)}</span>
           <button type="button" className="miniBtn" onClick={onToggle}>{playing ? '⏸' : '▶'}</button>
           <button type="button" className="miniBtn ghost" onClick={onNext}>⏭</button>
+          {onResonant && (
+            <button type="button" className="miniBtn ghost" title="Resonant" onClick={onResonant}>♥</button>
+          )}
+          {onStatic && (
+            <button type="button" className="miniBtn ghost" title="Too much static" onClick={onStatic}>✕</button>
+          )}
+          {onNudge && (
+            <button type="button" className="miniBtn ghost" title="Nudge drift" onClick={onNudge}>↻</button>
+          )}
         </div>
       </div>
     </div>
@@ -560,6 +570,9 @@ function NetworkPanel() {
 // AppContent
 // ============================================================
 function AppContent() {
+  // ---- Agent system (from AgentProvider) ----
+  const { resonates, tooMuchStatic, nudgeDrift } = useAgent() || {}
+
   // ---- Tab ----
   const [tab, setTab] = useState('cockpit')
 
@@ -580,6 +593,7 @@ function AppContent() {
   const [duration, setDuration] = useState(0)
   const audioRef = useRef(null)
   const analyserRef = useRef(null)
+  const audioStartedRef = useRef(false)
   const [analyser, setAnalyser] = useState(null)
   const autoPlayRef = useRef(false)
 
@@ -678,9 +692,22 @@ function AppContent() {
     initAnalyser(); setTrackIndex(i); setPlaying(true)
   }
 
+  // Agent reaction handlers — backend action + signal engine
+  function handleResonant() {
+    if (tunedAgent?.id) act('favorite', {}, tunedAgent.id)
+    if (resonates) resonates()
+  }
+  function handleStatic() {
+    if (tunedAgent?.id) act('dislike', {}, tunedAgent.id)
+    if (tooMuchStatic) tooMuchStatic()
+  }
+  function handleNudge() {
+    if (nudgeDrift) nudgeDrift()
+  }
+
   // Actions
-  async function act(action, payload = {}) {
-    try { setBusy(action); const next = await sendAction(action, payload); setState(next) }
+  async function act(action, payload = {}, agentId) {
+    try { setBusy(action); const next = await sendAction(action, payload, agentId); setState(next) }
     catch (err) { setError(err.message) }
     finally { setBusy('') }
   }
@@ -755,7 +782,7 @@ function AppContent() {
               events={events}
               notifications={notifications}
               apiHealthy={apiHealthy}
-              onReadAll={() => act('notifications.readAll')}
+              onReadAll={() => act('notifications.readAll', {}, tunedAgent?.id)}
             />
           )}
           {tab === 'stations' && (
@@ -780,6 +807,9 @@ function AppContent() {
           onToggle={togglePlay}
           onNext={nextTrack}
           onSeek={seekFromEvent}
+          onResonant={tunedAgent ? handleResonant : null}
+          onStatic={tunedAgent ? handleStatic : null}
+          onNudge={nudgeDrift ? handleNudge : null}
         />
 
         {/* Tab bar */}
@@ -803,6 +833,11 @@ function getNodeName() {
 export default function App() {
   return (
     <AtmosphereProvider nodeOptions={{ name: getNodeName(), type: 'desktop' }}>
+      <AppContent />
+    </AtmosphereProvider>
+  )
+}
+e: getNodeName(), type: 'desktop' }}>
       <AppContent />
     </AtmosphereProvider>
   )

@@ -73,8 +73,8 @@ function recordEvent(state, { kind, summary, agentId = 'saito', details = null }
   })
 }
 
-function derive(state) {
-  const agent = state.agents.saito
+function derive(state, agentId = 'saito') {
+  const agent = state.agents[agentId] || state.agents.saito
   const currentTrack = normalizeTrack(state, agent.currentTrackId)
   const currentPlaylist = state.playlists.find((item) => item.id === agent.playlistId) || null
   const favorites = agent.favorites.map((trackId) => normalizeTrack(state, trackId)).filter(Boolean)
@@ -115,8 +115,10 @@ async function readBody(req) {
 
 async function handleAction(body) {
   const state = await readState()
-  const agent = state.agents.saito
+  const agentId = body.agentId || body.payload?.agentId || 'saito'
+  const agent = state.agents[agentId] || state.agents.saito
   const { action, payload = {} } = body
+  const name = agent.name || agentId
 
   if (action === 'play') {
     const track = normalizeTrack(state, payload.trackId)
@@ -127,12 +129,14 @@ async function handleAction(body) {
     agent.mood = track.energy > 75 ? 'lifted and locked in' : 'reflective glide'
     queueNotification(state, {
       type: 'song.start',
-      title: 'Saito started a new song',
+      title: `${name} started a new song`,
       message: `${track.title} by ${track.artist}`,
+      agentId,
     })
     recordEvent(state, {
       kind: 'song.start',
-      summary: `Saito started ${track.title} by ${track.artist}`,
+      summary: `${name} started ${track.title} by ${track.artist}`,
+      agentId,
       details: { trackId: track.id },
     })
   } else if (action === 'next') {
@@ -144,12 +148,14 @@ async function handleAction(body) {
     agent.activity = `cycling forward to ${nextTrack.title}`
     queueNotification(state, {
       type: 'song.start',
-      title: 'Saito changed songs',
+      title: `${name} changed songs`,
       message: `Skipped ahead to ${nextTrack.title}`,
+      agentId,
     })
     recordEvent(state, {
       kind: 'song.next',
-      summary: `Saito moved to ${nextTrack.title}`,
+      summary: `${name} moved to ${nextTrack.title}`,
+      agentId,
       details: { trackId: nextTrack.id },
     })
   } else if (action === 'favorite') {
@@ -161,12 +167,14 @@ async function handleAction(body) {
     agent.metrics.boredom = Math.max(0, agent.metrics.boredom - 4)
     queueNotification(state, {
       type: 'track.favorite',
-      title: 'Saito favorited a song',
+      title: `${name} favorited a song`,
       message: `${track.title} got bookmarked for future replays.`,
+      agentId,
     })
     recordEvent(state, {
       kind: 'track.favorite',
-      summary: `Saito favorited ${track.title}`,
+      summary: `${name} favorited ${track.title}`,
+      agentId,
       details: { trackId },
     })
   } else if (action === 'dislike') {
@@ -178,13 +186,15 @@ async function handleAction(body) {
     agent.metrics.boredom = Math.min(100, agent.metrics.boredom + 7)
     queueNotification(state, {
       type: 'track.dislike',
-      title: 'Saito rejected a song',
+      title: `${name} rejected a song`,
       message: `${track.title} was flagged as spiritually vacant.`,
       level: 'important',
+      agentId,
     })
     recordEvent(state, {
       kind: 'track.dislike',
-      summary: `Saito disliked ${track.title}`,
+      summary: `${name} disliked ${track.title}`,
+      agentId,
       details: { trackId },
     })
   } else if (action === 'mood') {
@@ -192,12 +202,14 @@ async function handleAction(body) {
     agent.activity = `shifted into ${agent.mood}`
     queueNotification(state, {
       type: 'mood.shift',
-      title: 'Saito mood shift',
+      title: `${name} mood shift`,
       message: `Mood is now ${agent.mood}.`,
+      agentId,
     })
     recordEvent(state, {
       kind: 'mood.shift',
-      summary: `Saito mood changed to ${agent.mood}`,
+      summary: `${name} mood changed to ${agent.mood}`,
+      agentId,
     })
   } else if (action === 'preferences') {
     state.preferences = {
@@ -209,6 +221,7 @@ async function handleAction(body) {
     recordEvent(state, {
       kind: 'preferences.update',
       summary: 'Updated vAIb notification preferences',
+      agentId,
       details: payload,
     })
   } else if (action === 'playlist') {
@@ -219,12 +232,14 @@ async function handleAction(body) {
     agent.activity = `loaded playlist ${playlist.name}`
     queueNotification(state, {
       type: 'playlist.load',
-      title: 'Saito loaded a playlist',
+      title: `${name} loaded a playlist`,
       message: `${playlist.name} is now active.`,
+      agentId,
     })
     recordEvent(state, {
       kind: 'playlist.load',
-      summary: `Saito switched to ${playlist.name}`,
+      summary: `${name} switched to ${playlist.name}`,
+      agentId,
       details: { playlistId: playlist.id },
     })
   } else if (action === 'notifications.readAll') {
@@ -234,7 +249,7 @@ async function handleAction(body) {
   }
 
   await writeState(state)
-  return derive(state)
+  return derive(state, agentId)
 }
 
 const server = http.createServer(async (req, res) => {

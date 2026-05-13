@@ -123,8 +123,6 @@ const auditLog = [];
 function audit(category, message, data = {}) {
   const entry = { timestamp: new Date().toISOString(), category, message, ...data };
   auditLog.push(entry);
-  const scoreStr = data.score ? `(score +${data.score})` : data.scoreContribution ? `(+${data.scoreContribution})` : '';
-  console.log(`[TEMP][DISCOVERY][${category}] ${message}`, scoreStr);
 }
 
 export function getAuditLog() { return auditLog; }

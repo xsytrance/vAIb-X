@@ -95,7 +95,7 @@ export function createSignalClient() {
     ws.onopen = () => {
       state = 'connected';
       reconnectAttempt = 0;
-      console.log('[TEMP] WS onopen — sending HELLO, nodeId=' + nodeId);
+      // WS connected, sending HELLO
       ws.send(JSON.stringify({
         type: MessageTypes.HELLO,
         nodeId,
@@ -115,7 +115,7 @@ export function createSignalClient() {
         console.warn('[SignalClient] failed to parse message:', event.data);
         return;
       }
-      console.log('[TEMP] WS inbound — type=' + (msg.type || '?') + ', src=' + (msg.nodeId || msg.leaderId || msg.source || '?'));
+      // WS message received
       notifyMessage(msg);
     };
 

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 4013",
     "build": "vite build",
-    "build:android": "VITE_API_BASE=http://100.110.224.126:4014 vite build && npx cap sync android",
+    "build:android": "VITE_API_BASE=${VITE_API_BASE:-http://localhost:4014} vite build && npx cap sync android",
     "preview": "vite preview --host 0.0.0.0 --port 4013",
     "api:library": "node server/api.mjs",
     "relay": "node server/relay.mjs",
