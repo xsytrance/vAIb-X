@@ -540,7 +540,7 @@ function NetworkPanel() {
   const { ri, isLeader, leaderId, nodes, myNode, connected, connectionState, connect, disconnect } = useAtmosphere()
   const [relayUrl, setRelayUrl] = useState(() => {
     const proto = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    return `${proto}//${window.location.hostname}:666/signal`
+    return `${proto}//${window.location.hostname}:3014/signal`
   })
   const statusColor = connectionState === 'connected' ? '#8effcb' : connectionState === 'connecting' ? '#ffe57c' : '#ff9cba'
 

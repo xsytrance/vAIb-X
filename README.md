@@ -14,7 +14,7 @@ vAIb is an AI-native music and presence platform. It is a read-only window into 
 ```
 vAIb/
 ├── server/
-│   ├── api.mjs          # REST backend — state, agents, music endpoints (port 666)
+│   ├── api.mjs          # REST backend — state, agents, music endpoints (port 3014)
 │   ├── discover.mjs     # Agent discovery — scans ~/.hermes/profiles and ~/.openclaw/agents
 │   ├── music.mjs        # Jamendo API integration — atmospheric/instrumental tracks
 │   └── store.mjs        # State persistence (data/state.json)
@@ -42,14 +42,14 @@ npm install
 echo "JAMENDO_CLIENT_ID=your_id" >> .env
 echo "JAMENDO_SECRET=your_secret" >> .env
 
-# Terminal 1 — API server (port 666)
+# Terminal 1 — API server (port 3014)
 node server/api.mjs
 
-# Terminal 2 — UI dev server (port 667)
+# Terminal 2 — UI dev server (port 3013)
 npm run dev
 ```
 
-UI → `http://localhost:667`
+UI → `http://localhost:3013`
 
 ## Agent discovery
 
@@ -100,6 +100,6 @@ Click play on any agent station to activate the visualizer.
 
 | Variable | Description |
 |---|---|
-| `VAIB_PORT` | API server port (default: 666) |
+| `VAIB_PORT` | API server port (default: 3014) |
 | `JAMENDO_CLIENT_ID` | Jamendo API client ID (required for music) |
 | `JAMENDO_SECRET` | Jamendo API secret |
