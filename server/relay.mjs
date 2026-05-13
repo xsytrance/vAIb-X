@@ -9,7 +9,7 @@ import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, "..");
-const PORT = process.env.RELAY_PORT || 4014;
+const PORT = process.env.RELAY_PORT || 666;
 const clients = new Map(); // clientId → WebSocket
 let nextId = 1;
 let msgCount = 0;

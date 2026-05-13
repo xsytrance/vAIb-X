@@ -27,7 +27,7 @@ import { clone, readState, writeState } from './store.mjs'
 import { discoverAgents } from './discover.mjs'
 import { fetchCuratedTracks, isConfigured as musicConfigured } from './music.mjs'
 
-const port = Number(process.env.VAIB_PORT || 4014)
+const port = Number(process.env.VAIB_PORT || 666)
 
 function sendJson(res, status, payload) {
   res.writeHead(status, {

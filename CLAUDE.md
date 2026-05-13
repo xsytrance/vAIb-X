@@ -9,11 +9,11 @@ vAIb is a single-screen agent presence and music platform. It shows a fleet of A
 Always need two processes:
 
 ```bash
-node server/api.mjs      # port 4014 — REST + agent discovery + music
-npm run dev              # port 4013 — Vite/React UI
+node server/api.mjs      # port 666 — REST + agent discovery + music
+npm run dev              # port 667 — Vite/React UI
 ```
 
-Both bind to `0.0.0.0` — accessible at `http://<your-host-ip>:4013`.
+Both bind to `0.0.0.0` — accessible at `http://<your-host-ip>:667`.
 
 Credentials in `.env` (gitignored). Do not commit it.
 
@@ -54,7 +54,7 @@ Credentials in `.env` (gitignored). Do not commit it.
 ## Common gotchas
 
 - **`JAMENDO_CLIENT_ID` not loading**: `music.mjs` uses `getClientId()` lazily. If you add a new env var in another module, make sure it's read at call time, not at import/module-init time (ES module imports are hoisted).
-- **Port conflict**: `relay.mjs` also tries port 4014. Don't run relay and api simultaneously without changing `RELAY_PORT`.
+- **Port conflict**: `relay.mjs` also tries port 666. Don't run relay and api simultaneously without changing `RELAY_PORT`.
 - **Audio not starting**: Browser blocks autoplay. Audio only starts on user gesture (click anywhere).
 - **`createMediaElementSource` error**: Can only be called once per audio element. The `try/catch` in `initAnalyser` handles this.
 

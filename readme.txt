@@ -13,8 +13,8 @@ vAIb is now being repurposed into an AI-native music player.
 
 ## Local services
 
-- UI dev server: `npm run dev` on port `4013`
-- API server: `npm run api:library` on port `4014`
+- UI dev server: `npm run dev` on port `667`
+- API server: `npm run api:library` on port `666`
 
 The Vite dev server proxies `/api/backend/*` to the API server.
 
