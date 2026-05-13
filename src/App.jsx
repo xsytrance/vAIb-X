@@ -837,8 +837,3 @@ export default function App() {
     </AtmosphereProvider>
   )
 }
-e: getNodeName(), type: 'desktop' }}>
-      <AppContent />
-    </AtmosphereProvider>
-  )
-}
